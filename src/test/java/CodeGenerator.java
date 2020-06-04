@@ -1,17 +1,39 @@
-import com.google.common.base.CaseFormat;
-import freemarker.template.TemplateExceptionHandler;
-import org.apache.commons.lang3.StringUtils;
-import org.mybatis.generator.api.MyBatisGenerator;
-import org.mybatis.generator.config.*;
-import org.mybatis.generator.internal.DefaultShellCallback;
+import static com.company.project.core.ProjectConstant.BASE_PACKAGE;
+import static com.company.project.core.ProjectConstant.CONTROLLER_PACKAGE;
+import static com.company.project.core.ProjectConstant.MAPPER_INTERFACE_REFERENCE;
+import static com.company.project.core.ProjectConstant.MAPPER_PACKAGE;
+import static com.company.project.core.ProjectConstant.MODEL_PACKAGE;
+import static com.company.project.core.ProjectConstant.SERVICE_IMPL_PACKAGE;
+import static com.company.project.core.ProjectConstant.SERVICE_PACKAGE;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.company.project.core.ProjectConstant.*;
+import org.apache.commons.lang3.StringUtils;
+import org.mybatis.generator.api.MyBatisGenerator;
+import org.mybatis.generator.config.Configuration;
+import org.mybatis.generator.config.Context;
+import org.mybatis.generator.config.GeneratedKey;
+import org.mybatis.generator.config.JDBCConnectionConfiguration;
+import org.mybatis.generator.config.JavaClientGeneratorConfiguration;
+import org.mybatis.generator.config.JavaModelGeneratorConfiguration;
+import org.mybatis.generator.config.ModelType;
+import org.mybatis.generator.config.PluginConfiguration;
+import org.mybatis.generator.config.PropertyRegistry;
+import org.mybatis.generator.config.SqlMapGeneratorConfiguration;
+import org.mybatis.generator.config.TableConfiguration;
+import org.mybatis.generator.internal.DefaultShellCallback;
+
+import com.google.common.base.CaseFormat;
+
+import freemarker.template.TemplateExceptionHandler;
 
 /**
  * 代码生成器，根据数据表名称生成对应的Model、Mapper、Service、Controller简化开发。
@@ -37,8 +59,8 @@ public class CodeGenerator {
     private static final String DATE = new SimpleDateFormat("yyyy/MM/dd").format(new Date());//@date
 
     public static void main(String[] args) {
-        genCode("输入表名");
-        //genCodeByCustomModelName("输入表名","输入自定义Model名称");
+        //        genCode("orm_user");
+        genCodeByCustomModelName("orm_user", "User");
     }
 
     /**
@@ -104,7 +126,15 @@ public class CodeGenerator {
         tableConfiguration.setTableName(tableName);
         if (StringUtils.isNotEmpty(modelName))tableConfiguration.setDomainObjectName(modelName);
         tableConfiguration.setGeneratedKey(new GeneratedKey("id", "Mysql", true, null));
+        tableConfiguration.addProperty("swagger", "true");
+        tableConfiguration.addProperty("lombok", "Data,EqualsAndHashCodeAndCallSuper");
         context.addTableConfiguration(tableConfiguration);
+
+
+        PluginConfiguration pluginConfiguration2 = new PluginConfiguration();
+        pluginConfiguration2.setConfigurationType("com.softwareloop.mybatis.generator.plugins.LombokPlugin");
+        //        pluginConfiguration2.addProperty("mappers", MAPPER_INTERFACE_REFERENCE);
+        context.addPluginConfiguration(pluginConfiguration2);
 
         List<String> warnings;
         MyBatisGenerator generator;
